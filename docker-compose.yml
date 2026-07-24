@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: joongna_nginx
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf:ro
+      - ./src:/var/www/html:ro
+      - ./docker/apache/uploads:/var/www/html/uploads:ro
+      - ./docker/nginx/logs:/var/log/nginx
+    depends_on:
+      - apache
+    networks:
+      - joongna_net
+
+  apache:
+    build:
+      context: ./docker/apache
+      dockerfile: Dockerfile
+    user: "33:33"
+    container_name: joongna_apache
+    restart: unless-stopped
+    expose:
+      - "80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/apache/apache.conf:/etc/apache2/sites-available/000-default.conf:ro
+      - ./docker/apache/php.ini:/usr/local/etc/php/conf.d/zz-joongna.ini:ro
+      - ./docker/apache/uploads:/var/www/html/uploads
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=joongna
+      - DB_USER=joongna
+      - DB_PASS=joongna_strong_pw_2024
+      # 실제 이메일 발송이 필요하면 아래 6개 env 주석 해제 후 값 입력.
+      # 설정하지 않으면 MailHog(http://localhost:8025)로 전송됨 (개발용).
+      # Gmail 예시: SMTP_HOST=smtp.gmail.com, SMTP_PORT=587,
+      # SMTP_FROM=계정@gmail.com, SMTP_USER=계정@gmail.com,
+      # SMTP_PASS=앱비밀번호 (2FA 설정 후 발급), SMTP_AUTH=on
+      # - SMTP_HOST=smtp.gmail.com
+      # - SMTP_PORT=587
+      # - SMTP_FROM=your-email@gmail.com
+      # - SMTP_USER=your-email@gmail.com
+      # - SMTP_PASS=your-16-char-app-password
+      # - SMTP_AUTH=on
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - joongna_net
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: joongna_mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_strong_pw_2024
+      - MYSQL_DATABASE=joongna
+      - MYSQL_USER=joongna
+      - MYSQL_PASSWORD=joongna_strong_pw_2024
+      - TZ=Asia/Seoul
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - joongna_net
+
+networks:
+  joongna_net:
+    driver: bridge
+
+volumes:
+  mariadb_data:

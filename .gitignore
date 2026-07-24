@@ -1,0 +1,27 @@
+# Dependencies
+vendor/
+node_modules/
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/apache/uploads/
+docker/nginx/logs/
+
+# Backup / temp
+*_backup_*/
+*.backup
+
+# Unused reference files
+참고자료*/
