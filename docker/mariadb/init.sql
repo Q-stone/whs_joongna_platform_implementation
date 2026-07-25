@@ -21,6 +21,7 @@ CREATE TABLE users (
   acc_report_ban  TINYINT UNSIGNED NOT NULL DEFAULT 0,
   acc_totp_secret VARCHAR(64) NOT NULL DEFAULT '',
   acc_totp_ok     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  pw_reset_time   DATETIME NULL DEFAULT NULL,
   acc_balance     BIGINT NOT NULL DEFAULT 0,
   acc_trust       DECIMAL(4,2) NOT NULL DEFAULT 50.00,
   acc_trade_count INT UNSIGNED NOT NULL DEFAULT 0,

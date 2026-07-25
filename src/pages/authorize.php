@@ -103,6 +103,6 @@ document.getElementById('show_privacy')?.addEventListener('click',function(){sho
   <label><?= e($L['login_pw']) ?></label><input type="password" name="form_pw" placeholder="<?= e($L['login_pw_placeholder']) ?>" autocomplete="current-password">
   <div style="margin-top:14px"><button class="btn primary lg" id="auth_submit"><?= e($L['login_btn']) ?></button></div>
 </form>
-<div class="msg info" style="margin-top:12px">계정이 없으신가요? <a href="/?mode=authorize&signup">회원가입</a></div>
+<div class="msg info" style="margin-top:12px">계정이 없으신가요? <a href="/?mode=authorize&signup">회원가입</a> · <a href="/?mode=pw_reset">비밀번호 초기화</a></div>
 <script>document.getElementById('auth_submit').addEventListener('click',function(){Jn.req('/service_bridge.php',{form:new FormData(document.getElementById('auth_form'))}).then(function(j){if(j&&j.totp_need){location.reload();return}if(j&&j.error)Jn.toast(j.description,'err');if(j&&j.success){Jn.toast(j.description,'ok');setTimeout(function(){location.href=j.redirect||'/'},500)}})})</script>
 <?php endif; ?>

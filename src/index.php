@@ -43,6 +43,7 @@ $ROUTE = [
     'search'      => ['page' => 'search',      'name' => $L['search_title'] ?? '검색',         'acl' => 'none', 'desc' => '상품명, 카테고리, AND/OR로 상품 상세 검색. (빈 검색은 전체 상품 목록)'],
     'terms'       => ['page' => 'terms',       'name' => $L['terms_title'] ?? '이용약관',      'acl' => 'none', 'desc' => '나무장터 이용약관.'],
     'privacy'     => ['page' => 'privacy',     'name' => $L['privacy_title'] ?? '개인정보처리방침','acl' => 'none', 'desc' => '개인정보처리방침.'],
+    'pw_reset'    => ['page' => 'pw_reset',    'name' => '비밀번호 초기화',   'acl' => 'authorize', 'desc' => 'TOTP로 비밀번호 초기화.'],
 ];
 
 $mode = $_GET['mode'] ?? 'board';
