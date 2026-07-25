@@ -14,7 +14,7 @@ global $sql;
     <label>TOTP 6자리 코드</label>
     <input name="form_totp" id="pr_totp" inputmode="numeric" pattern="[0-9]{6}" placeholder="Authenticator 앱 코드" autocomplete="off">
   </div>
-  <div style="margin-top:12px"><button class="btn primary lg" id="pr_submit">비밀번호 초기화</button></div>
+  <div style="margin-top:12px"><button class="btn primary lg" type="button" id="pr_submit">비밀번호 초기화</button></div>
 </form>
 <div id="pr_result" style="margin-top:12px"></div>
 <div class="msg info" style="margin-top:12px"><a href="/?mode=authorize">로그인으로 돌아가기</a></div>
