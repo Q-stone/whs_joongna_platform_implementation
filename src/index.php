@@ -131,6 +131,7 @@ $popupNotice = $sysPopupOn ? $sql->one("SELECT nb_id,nb_title,nb_content FROM no
   <meta property="og:description" content="<?= $seoDesc ?>">
   <link rel="canonical" href="<?= e(('https://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . ($_SERVER['REQUEST_URI'] ?? '/'))) ?>">
   <link rel="stylesheet" href="/cdn/css/style.css?<?= filemtime(__DIR__ . '/cdn/css/style.css') ?>">
+  <script src="/cdn/js/qrcode.min.js"></script>
   <script src="/cdn/js/common.js?36"></script>
   <script src="/cdn/js/chat.js?12"></script>
 </head>

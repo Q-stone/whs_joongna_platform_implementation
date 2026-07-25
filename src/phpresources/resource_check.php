@@ -48,8 +48,8 @@ function get_user_ip(): array {
         return [trim($_SERVER['HTTP_CF_CONNECTING_IP']), 1];
     }
     $ip = '0';
-    foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'] as $k) {
-        $v = getenv($k);
+    foreach (['HTTP_CF_CONNECTING_IP','HTTP_X_REAL_IP','HTTP_CLIENT_IP','HTTP_X_FORWARDED_FOR','HTTP_X_FORWARDED','HTTP_FORWARDED_FOR','HTTP_FORWARDED','REMOTE_ADDR'] as $k) {
+        $v = $_SERVER[$k] ?? getenv($k) ?? '';
         if ($v !== false && $v !== '') {
             if ($k === 'HTTP_X_FORWARDED_FOR' && strpos($v, ',') !== false) {
                 $v = trim(explode(',', $v)[0]);
