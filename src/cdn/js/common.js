@@ -121,7 +121,7 @@ var doEncrypt = function(cb) {
   function handleRes(j, okCb) {
     if (!j) { toast(t('toast_err')); return; }
     if (j.csrf_expired) { toast(j.description || t('csrf_err'), 'err'); setTimeout(function () { location.reload(); }, 1300); return; }
-    if (j.need_admin_auth) { showAdminReauth(); return; }
+    if (j.need_admin_auth) { toast(j.description || '관리자 인증 필요', 'warn'); setTimeout(function(){location.href='/?mode=admin'},800); return; }
     if (j.error) { toast(j.description || t('toast_err'), 'err'); if (j.redirect && j.notice) setTimeout(function () { location.href = j.redirect; }, 1300); return; }
     if (j.success) { if (okCb) okCb(j); else toast(j.description || t('toast_ok'), 'ok'); if (j.redirect) setTimeout(function () { location.href = j.redirect; }, 700); return; }
     if (j.redirect) { location.href = j.redirect; return; }
@@ -185,17 +185,6 @@ var doEncrypt = function(cb) {
       { sticky: true });
   }
 
-  /* 관리자 재인증 modal (TOTP) */
-  function showAdminReauth() {
-    var body = '<div class="msg warn">관리자 인증이 만료되었습니다. TOTP 코드를 입력하세요.</div><label>TOTP 6자리</label><input id="rc" inputmode="numeric" pattern="[0-9]{6}" placeholder="000000"><button class="btn primary" id="rgo" style="margin-top:8px">인증</button>';
-    var m = modal('관리자 재인증', body, '<button class="btn ghost" id="reauth_close">닫기</button>', { onReady: function (mm, cl) {
-      mm.querySelector('#reauth_close').onclick = function () { cl(); };
-      mm.querySelector('#rgo').onclick = function () {
-        var fd = new FormData(); fd.append('token', csrf()); fd.append('mode', 'admin_auth'); fd.append('code', mm.querySelector('#rc').value);
-        req('/service_bridge.php', { form: fd }).then(function (j) { if (j && j.success) { cl(); toast(j.description, 'ok'); } else { toast(j.description || '오류', 'err'); } });
-      };
-    }});
-  }
   /* 언어 즉시 로드 (DOMContentLoaded보다 먼저 동기 cached 사용) */
   loadLang();
 
