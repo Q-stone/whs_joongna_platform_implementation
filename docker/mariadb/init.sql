@@ -302,4 +302,3 @@ CREATE TABLE visitor_log (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Admin 계정은 웹 인터페이스에서 masterAdminCreate로 생성 (localhost 접속 필요)
-AND NOT EXISTS (SELECT 1 FROM ip_security);

@@ -44,5 +44,5 @@ WORKDIR /var/www/html
 # uploads 폴더를 www-data 권한으로 미리 생성 (볼륨 마운트 시에도 작동)
 RUN mkdir -p /var/www/html/uploads/img /var/www/html/uploads/vid && \
     chown -R www-data:www-data /var/www/html/uploads && \
-    chmod -R 777 /var/www/html/uploads
+    chmod -R 770 /var/www/html/uploads
 EXPOSE 80
