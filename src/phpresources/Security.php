@@ -19,15 +19,22 @@ class Security {
     /** 세션 안정 CSRF 토큰 (1회 발급 후 유지) */
     public static function csrf(): string { return stable_csrf(); }
 
-    /** CSRF 검증. POST 'token' / 헤더 'X-CSRF-Token' / GET 'token'(poll 전용) 지원. */
+    /** CSRF 검증. POST 'token' / 헤더 'X-CSRF-Token' / GET 'token'(poll 전용) 지원.
+ *  HMAC 윈도우 기반: 현재·직전·다음 15분 윈도우 허용 (시계 오차 대응) */
     public static function csrf_ok(): bool {
-        if (empty($_SESSION['csrf_token'])) return false;
+        $secret = $_SESSION['csrf_secret'] ?? ''; if ($secret === '') return false;
         $given = '';
         if (!empty($_POST['token'])) $given = trim($_POST['token']);
         elseif (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) $given = trim($_SERVER['HTTP_X_CSRF_TOKEN']);
         elseif (!empty($_GET['token'])) $given = trim($_GET['token']);
         if ($given === '' || !preg_match('/^([a-f0-9]){64}$/', $given)) return false;
-        return hash_equals($_SESSION['csrf_token'], $given);
+        $sid = session_id();
+        $w = intdiv(time(), 900); // 15분 윈도우
+        // ±1 윈도우 허용 (시계 차이 + 토큰 만료 직전 대응)
+        for ($i = -1; $i <= 1; $i++) {
+            if (hash_equals(hash_hmac('sha256', $sid . ':' . ($w + $i), $secret), $given)) return true;
+        }
+        return false;
     }
 
     /** CSRF 실패 시 즉시 에러 응답 */

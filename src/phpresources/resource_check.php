@@ -61,20 +61,21 @@ function get_user_ip(): array {
 }
 function client_ip(): string { return get_user_ip()[0]; }
 
-/** 세션 안정 CSRF 토큰 - 없으면 1회 발급 후 유지 */
-function mk_sess_tkn(): string {
-    return hash('sha256', bin2hex(random_bytes(16)) . client_ip() . 'joongna_sz42#x!q7' . (string)microtime(true));
+/** CSRF 토큰: HMAC(세션시크릿, session_id:time_window). 15분 자동 순환 */
+function csrf_secret(): string {
+    if (empty($_SESSION['csrf_secret'])) {
+        $_SESSION['csrf_secret'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_secret'];
 }
 function stable_csrf(): string {
-    if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token']) || strlen($_SESSION['csrf_token']) !== 64) {
-        $_SESSION['csrf_token'] = mk_sess_tkn();
-    }
-    return $_SESSION['csrf_token'];
+    $secret = csrf_secret();
+    $payload = session_id() . ':' . intdiv(time(), 900); // 15분 윈도우
+    return hash_hmac('sha256', $payload, $secret);
 }
-/** token 회전 (로그인/로그아웃/비번변경 등 민감 전환시만 호출) */
 function rotate_csrf(): string {
-    $_SESSION['csrf_token'] = mk_sess_tkn();
-    return $_SESSION['csrf_token'];
+    unset($_SESSION['csrf_secret']);
+    return stable_csrf();
 }
 
 function mk_verify_code(): string {
