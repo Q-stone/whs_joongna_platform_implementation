@@ -2,7 +2,7 @@
 vendor/
 node_modules/
 
-# Environment
+# IaC secrets
 .env
 
 # IDE

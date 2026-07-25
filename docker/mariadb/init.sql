@@ -300,9 +300,5 @@ CREATE TABLE visitor_log (
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO users (acc_id, acc_nick, acc_pw, acc_email, acc_group, acc_status, acc_onelogin, registertime)
-SELECT 'admin', 'Admin', '76601eebb929777e64fe77c9de51ff4d2746b445b81808d2f1590c65eea6399a', 'admin@joongna.local', 1, 0, 1, NOW()
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE acc_id='admin');
-INSERT INTO ip_security (is_user, is_check_ip, is_check_cc, is_allow_cc)
-SELECT acc_number, 0, 0, 'KR' FROM users WHERE acc_id='admin'
+-- Admin 계정은 웹 인터페이스에서 masterAdminCreate로 생성 (localhost 접속 필요)
 AND NOT EXISTS (SELECT 1 FROM ip_security);

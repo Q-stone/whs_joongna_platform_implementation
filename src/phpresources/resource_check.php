@@ -21,15 +21,15 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 ini_set('log_errors', '1');
 ini_set('display_errors', '0');
 
-// --- DB 접속 정보 (compose 환경변수) ---
+// --- DB 접속 정보 (compose .env 환경변수) ---
 define('DB_HOST', getenv('DB_HOST') ?: 'mariadb');
 define('DB_NAME', getenv('DB_NAME') ?: 'joongna');
 define('DB_USER', getenv('DB_USER') ?: 'joongna');
-define('DB_PASS', getenv('DB_PASS') ?: 'joongna_strong_pw_2024');
+define('DB_PASS', getenv('DB_PASS')); // .env 필수, fallback 없음
 
-// 비밀번호 솔트
-define('PW_SALT_PRE', 'jNn9$02p9xbz_5!keW#');
-define('PW_SALT_POST', 'p0ad@3bsdj21as_dF3gdf@jamxz#!');
+// 비밀번호 솔트 (.env 환경변수)
+define('PW_SALT_PRE', getenv('PW_SALT_PRE') ?: '');
+define('PW_SALT_POST', getenv('PW_SALT_POST') ?: '');
 
 define('UPLOAD_DIR', __DIR__ . '/../uploads/');
 define('UPLOAD_WEB', '/uploads/');

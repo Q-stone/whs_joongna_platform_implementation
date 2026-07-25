@@ -13,46 +13,76 @@
 - ECDH X25519 + AES-256-GCM E2E 암호화
 - IP/UA/TOR 차단 (방화벽)
 - SPA 라우팅 (페이지 전환 간 암호화)
-- 리버스 프록시 구조
-- 보안 요소 충실히 구현 (CSRF 방지, XSS 방지, SQLi 방지 (prepared Stmt), 파일 업로드 취약점 방지, IDOR 방지 등등)
 
 ## 설치
 
 ### 요구사항
 
-- Docker 24+
-- docker compose v2
+- Docker 24+, docker compose v2
+
+### 환경 설정
+
+```bash
+cp .env.example .env
+# .env 파일을 열어 비밀번호 등 보안 값 변경 (필수)
+```
 
 ### 실행
 
 ```bash
-git clone https://github.com/Q-stone/whs_joongna_platform_implementation.git
-cd whs_joongna_platform_implementation
 docker compose up -d
 ```
 
-### 접속
+접속: http://localhost:8082
 
-| 서비스 | URL |
-|--------|-----|
-| 플랫폼 | http://localhost:8082 |
+### 관리자 계정 생성
 
-### 초기 관리자 계정
+최초 실행 시 메인 페이지에 마스터 관리자 생성 폼이 나타납니다 (localhost/사설망 전용).
+
+1. TOTP 시크릿 생성 버튼 클릭
+2. QR 코드를 Authenticator 앱으로 스캔
+3. 6자리 TOTP 코드 입력 + ID/비밀번호/이메일 설정
+4. 생성 완료 후 로그인 → 마이페이지에서 TOTP 상태 확인
+
+## 보안
+
+| 항목 | 구현 |
+|------|------|
+| 비밀번호 | SHA-256 + 이중 솔트 (`.env` 환경변수) |
+| 세션 | HttpOnly + SameSite=Strict + regenerate_id |
+| API 암호화 | ECDH X25519 + AES-256-GCM |
+| CSRF | 세션 안정 토큰 |
+| XSS | htmlspecialchars + purify_rich |
+| SQLi | Prepared Statements |
+| IDOR | 판매자/소유자 검증 |
+| 파일 업로드 | 확장자·MIME 검증 + 난수 파일명 |
+| 방화벽 | IP·UA·TOR 차단 |
+| IaC | `.env`로 모든 비밀값 분리 (Git 미포함) |
+
+## 프로덕션 이메일
+
+기본: 이메일 인증 없이 회원가입 즉시 활성. 이메일 발송 필요 시 msmtp 설정:
+
+```bash
+docker exec joongna_apache sh -c "cat > /etc/msmtprc << 'EOF'
+account default
+host smtp.gmail.com
+port 587
+from your-email@gmail.com
+auth on
+user your-email@gmail.com
+password your-app-password
+tls on
+tls_starttls on
+EOF"
+```
+
+## 포트 변경
+
+`.env`에서 `APP_PORT` 수정:
 
 ```
-ID: admin
-PW: admin1234!!
-```
-
-관리자 계정은 TOTP가 설정되어 있어야 합니다. 마이페이지에서 TOTP 설정 후 관리자 페이지 접근 가능합니다.  
-
-### 포트 변경
-
-`docker-compose.yml`에서 `8082:8082`를 원하는 포트로 변경:
-
-```yaml
-ports:
-  - "80:8082"
+APP_PORT=80
 ```
 
 ## 구조
